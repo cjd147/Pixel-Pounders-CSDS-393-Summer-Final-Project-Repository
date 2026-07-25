@@ -1,4 +1,6 @@
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 
 public abstract class MedicalData {
 
@@ -9,6 +11,10 @@ public abstract class MedicalData {
 
     //diagnoseDate represents either the date diagnosed or the date administered depending on the type of data.
     private LocalDate diagnoseDate;
+
+    //Notes
+    private final List<Note> notes = new ArrayList<>();
+
 
     //Getter/Setters
 
@@ -30,6 +36,19 @@ public abstract class MedicalData {
 
     public void setDiagnoseDate(LocalDate diagnoseDate) {
         this.diagnoseDate = diagnoseDate;
+    }
+
+    //Notes
+    public void addNote(String author, String text) {
+        notes.add(new Note(author, text));
+    }
+
+    public List<Note> getNotes() {
+        return new ArrayList<>(notes); // return a copy so callers can't mutate internals
+    }
+
+    public void printNotes() {
+        notes.forEach(System.out::println);
     }
 
 }

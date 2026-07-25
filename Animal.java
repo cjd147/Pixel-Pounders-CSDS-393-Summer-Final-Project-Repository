@@ -1,5 +1,6 @@
 import javax.swing.*;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 
 public abstract class Animal {
@@ -43,6 +44,8 @@ public abstract class Animal {
     private String pattern;
 
 
+    //Notes
+    private final List<Note> notes = new ArrayList<>();
 
     //Getter/Setters
 
@@ -337,6 +340,21 @@ public abstract class Animal {
 
     public void removeDewormer(Dewormer e) {dewormerHistory.remove(e);}
     public void removeDewormer(int i) {dewormerHistory.remove(i);}
+
+    //Notes
+
+    public void addNote(String author, String text) {
+        notes.add(new Note(author, text));
+    }
+
+    public List<Note> getNotes() {
+        return new ArrayList<>(notes); // return a copy so callers can't mutate internals
+    }
+
+    public void printNotes() {
+        notes.forEach(System.out::println);
+    }
+
 
 
     //Other Methods
