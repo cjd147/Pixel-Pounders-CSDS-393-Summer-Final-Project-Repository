@@ -12,7 +12,7 @@ public abstract class Animal {
     private String registeredName;
     private boolean sameName;
     private String idTag;
-    private boolean ifRegistered;
+    private boolean registered;
     private int registeredID;
 
     //Sex
@@ -98,12 +98,12 @@ public abstract class Animal {
 
     //ifRegistered
 
-    public boolean isItRegistered() {
-        return ifRegistered;
+    public boolean isRegistered() {
+        return registered;
     }
 
-    public void setIfRegistered(boolean ifRegistered) {
-        this.ifRegistered = ifRegistered;
+    public void setRegistered(boolean registered) {
+        this.registered = registered;
     }
 
     //registeredID
