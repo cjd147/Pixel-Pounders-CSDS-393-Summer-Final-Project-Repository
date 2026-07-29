@@ -4,11 +4,9 @@ public class MedicalTest extends MedicalData{
 
     //Fields
 
-
     //TestType
     private MedicalTestType testType;
 
-    //isPositive (for Binary Test results only (positive or negative)
 
 
 
