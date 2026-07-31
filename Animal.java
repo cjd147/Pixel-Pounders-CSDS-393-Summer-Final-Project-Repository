@@ -385,6 +385,4 @@ public abstract class Animal {
     }
 
 
-
-
 }

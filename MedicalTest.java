@@ -7,6 +7,14 @@ public class MedicalTest extends MedicalData{
     //TestType
     private MedicalTestType testType;
 
+    //Test Result - Binary and non-binary option
+    private Measurement
+
+    //Constructor
+
+
+
+
 
 
 
