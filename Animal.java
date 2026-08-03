@@ -29,7 +29,7 @@ public abstract class Animal {
     private Animal twin;
     private int yearBorn;
     private LocalDate birthdate;
-    private List<Animal> children;
+    private List<Animal> children = new ArrayList<>();
 
     private List<MedicalCondition> medicalConditionsList;
     private List<MedicalProcedure> medicalProceduresList;

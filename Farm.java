@@ -1,5 +1,6 @@
 import java.time.LocalDate;
 import java.time.chrono.ChronoLocalDate;
+import java.util.ArrayList;
 import java.util.List;
 
 public class Farm {
@@ -13,10 +14,10 @@ public class Farm {
     private String farmAddress;
 
     //Herd List
-    private List<Herd> farmHerds;
+    private List<Herd> farmHerds = new ArrayList<>();
 
     //Appointment List
-    private List<Appointment> vetAppointments;
+    private List<Appointment> vetAppointments = new ArrayList<>();
 
     //Constructor
     public Farm(String s){
@@ -70,10 +71,10 @@ public class Farm {
     //time based getter
 
     public List<Appointment> getAppointmentsBefore(LocalDate localDate){
-        List<Appointment> before = List.of();
-        for(int i = 0; i <= vetAppointments.size(); i++){
-            if(localDate.isBefore(ChronoLocalDate.from(before.get(i).getAppointmentDate()))){
-                before.addLast(vetAppointments.get(i));
+        List<Appointment> before = new ArrayList<>();
+        for(Appointment appointment : vetAppointments){
+            if(localDate.isBefore(ChronoLocalDate.from(appointment.getAppointmentDate()))){
+                before.add(appointment);
             }
         }
         if(before.isEmpty()){
@@ -83,10 +84,10 @@ public class Farm {
     }
 
     public List<Appointment> getAppointmentsAfter(LocalDate localDate){
-        List<Appointment> after = List.of();
-        for(int i = 0; i <= vetAppointments.size(); i++){
-            if(localDate.isAfter(ChronoLocalDate.from(after.get(i).getAppointmentDate()))){
-                after.addLast(vetAppointments.get(i));
+        List<Appointment> after = new ArrayList<>();
+        for(Appointment appointment : vetAppointments){
+            if(localDate.isAfter(ChronoLocalDate.from(appointment.getAppointmentDate()))){
+                after.add(appointment);
             }
         }
         if(after.isEmpty()){
