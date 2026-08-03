@@ -1,5 +1,3 @@
-import java.time.LocalDate;
-
 public class Sheep extends Animal{
 
     //fields
