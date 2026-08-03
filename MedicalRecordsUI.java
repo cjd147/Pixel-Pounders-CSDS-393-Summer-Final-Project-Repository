@@ -7,9 +7,8 @@ import javafx.stage.Stage;
 
 /**
  * MedicalRecordsUI - shows one animal's medical history: conditions, procedures,
- * vaccinations, medications, dewormer history, and general notes.
- * Adding a note is supported now; adding new conditions/procedures/etc. would need
- * their own forms (test types, dosages, date pickers) - noted as a next step.
+ * vaccinations, medications, dewormer history, and general notes. Each section has
+ * an "Add" button to record a new entry.
  */
 public class MedicalRecordsUI {
 
@@ -20,28 +19,70 @@ public class MedicalRecordsUI {
         VBox root = new VBox(12);
         root.setPadding(new Insets(15));
 
-        root.getChildren().add(sectionLabel("Medical Conditions"));
-        root.getChildren().add(namesList(animal.getMedicalConditionsList().stream()
-                .map(MedicalData::getName).toList()));
+        ListView<String> conditionsView = namesList(animal);
+        ListView<String> proceduresView = namesList(animal);
+        ListView<String> vaccinationsView = namesList(animal);
+        ListView<String> medicationsView = namesList(animal);
+        ListView<String> dewormersView = namesList(animal);
 
-        root.getChildren().add(sectionLabel("Medical Procedures"));
-        root.getChildren().add(namesList(animal.getMedicalProceduresList().stream()
-                .map(MedicalData::getName).toList()));
+        Button addConditionBtn = new Button("Add");
+        Button addProcedureBtn = new Button("Add");
+        Button addVaccinationBtn = new Button("Add");
+        Button addMedicationBtn = new Button("Add");
+        Button addDewormerBtn = new Button("Add");
 
-        root.getChildren().add(sectionLabel("Vaccinations"));
-        root.getChildren().add(namesList(animal.getVaccineRecord().stream()
+        addConditionBtn.setOnAction(e -> MedicalEntryDialog.open("Add Medical Condition", "Diagnosed on", (name, date) -> {
+            MedicalCondition condition = new MedicalCondition();
+            condition.setName(name);
+            condition.setDiagnoseDate(date);
+            animal.addMedicalCondition(condition);
+            refresh(conditionsView, animal.getMedicalConditionsList().stream().map(MedicalData::getName).toList());
+        }));
+
+        addProcedureBtn.setOnAction(e -> MedicalEntryDialog.open("Add Medical Procedure", "Performed on", (name, date) -> {
+            MedicalProcedure procedure = new MedicalProcedure();
+            procedure.setName(name);
+            procedure.setDiagnoseDate(date);
+            animal.addMedicalProcedure(procedure);
+            refresh(proceduresView, animal.getMedicalProceduresList().stream().map(MedicalData::getName).toList());
+        }));
+
+        addVaccinationBtn.setOnAction(e -> VaccinationDialog.open(animal, () ->
+                refresh(vaccinationsView, animal.getVaccineRecord().stream()
+                        .map(v -> v.getVaccinationType() != null ? v.getVaccinationType().getVaccineName() : "(unnamed)")
+                        .toList())));
+
+        addMedicationBtn.setOnAction(e -> MedicationDialog.open(animal, () -> {
+            refresh(medicationsView, animal.getMedicationList().stream().map(MedicalData::getName).toList());
+            refresh(dewormersView, animal.getDewormerHistory().stream().map(MedicalData::getName).toList());
+        }));
+
+        addDewormerBtn.setOnAction(e -> MedicationDialog.open(animal, true, () -> {
+            refresh(medicationsView, animal.getMedicationList().stream().map(MedicalData::getName).toList());
+            refresh(dewormersView, animal.getDewormerHistory().stream().map(MedicalData::getName).toList());
+        }));
+
+        // initial population
+        refresh(conditionsView, animal.getMedicalConditionsList().stream().map(MedicalData::getName).toList());
+        refresh(proceduresView, animal.getMedicalProceduresList().stream().map(MedicalData::getName).toList());
+        refresh(vaccinationsView, animal.getVaccineRecord().stream()
                 .map(v -> v.getVaccinationType() != null ? v.getVaccinationType().getVaccineName() : "(unnamed)")
-                .toList()));
+                .toList());
+        refresh(medicationsView, animal.getMedicationList().stream().map(MedicalData::getName).toList());
+        refresh(dewormersView, animal.getDewormerHistory().stream().map(MedicalData::getName).toList());
 
-        root.getChildren().add(sectionLabel("Medications"));
-        root.getChildren().add(namesList(animal.getMedicationList().stream()
-                .map(MedicalData::getName).toList()));
+        root.getChildren().add(sectionRow("Medical Conditions", addConditionBtn));
+        root.getChildren().add(conditionsView);
+        root.getChildren().add(sectionRow("Medical Procedures", addProcedureBtn));
+        root.getChildren().add(proceduresView);
+        root.getChildren().add(sectionRow("Vaccinations", addVaccinationBtn));
+        root.getChildren().add(vaccinationsView);
+        root.getChildren().add(sectionRow("Medications", addMedicationBtn));
+        root.getChildren().add(medicationsView);
+        root.getChildren().add(sectionRow("Dewormer History", addDewormerBtn));
+        root.getChildren().add(dewormersView);
 
-        root.getChildren().add(sectionLabel("Dewormer History"));
-        root.getChildren().add(namesList(animal.getDewormerHistory().stream()
-                .map(MedicalData::getName).toList()));
-
-        root.getChildren().add(sectionLabel("Notes"));
+        root.getChildren().add(sectionRow("Notes", null));
         ListView<Note> notesListView = new ListView<>();
         notesListView.getItems().addAll(animal.getNotes());
         notesListView.setPrefHeight(120);
@@ -71,24 +112,32 @@ public class MedicalRecordsUI {
         ScrollPane scrollPane = new ScrollPane(root);
         scrollPane.setFitToWidth(true);
 
-        stage.setScene(new Scene(scrollPane, 450, 600));
+        stage.setScene(new Scene(scrollPane, 480, 700));
         stage.show();
     }
 
-    private static Label sectionLabel(String text) {
-        Label label = new Label(text);
+    private static HBox sectionRow(String title, Button addButton) {
+        Label label = new Label(title);
         label.setStyle("-fx-font-weight: bold;");
-        return label;
+        HBox row = new HBox(10, label);
+        if (addButton != null) {
+            row.getChildren().add(addButton);
+        }
+        return row;
     }
 
-    private static ListView<String> namesList(java.util.List<String> names) {
+    private static ListView<String> namesList(Animal animal) {
         ListView<String> listView = new ListView<>();
+        listView.setPrefHeight(70);
+        return listView;
+    }
+
+    private static void refresh(ListView<String> listView, java.util.List<String> names) {
+        listView.getItems().clear();
         if (names.isEmpty()) {
             listView.getItems().add("(none yet)");
         } else {
             listView.getItems().addAll(names);
         }
-        listView.setPrefHeight(70);
-        return listView;
     }
 }
