@@ -16,7 +16,8 @@ import java.util.List;
 
 /**
  * FarmUI - main entry point. Shows herds on this farm, lets you pick an animal
- * within a herd, and view its ancestor/descendant tree.
+ * within a herd, add new animals, view its ancestor/descendant tree, and view
+ * its medical records.
  */
 public class FarmUI extends Application {
 
@@ -41,12 +42,22 @@ public class FarmUI extends Application {
                 setText(empty || herd == null ? null : herd.getHerdName() + " (" + herd.getMembers().size() + ")");
             }
         });
+
+        Button addAnimalButton = new Button("Add Animal");
+        addAnimalButton.setDisable(true);
+
         herdListView.getSelectionModel().selectedItemProperty().addListener((obs, oldHerd, newHerd) -> {
-            animalListView.getItems().clear();
-            if (newHerd != null) {
-                @SuppressWarnings("unchecked")
-                List<Animal> members = newHerd.getMembers();
-                animalListView.getItems().addAll(members);
+            refreshAnimalList(newHerd);
+            addAnimalButton.setDisable(newHerd == null);
+        });
+
+        addAnimalButton.setOnAction(e -> {
+            Herd selectedHerd = herdListView.getSelectionModel().getSelectedItem();
+            if (selectedHerd != null) {
+                AddAnimalDialog.open(selectedHerd, () -> {
+                    herdListView.refresh(); // updates the "(count)" label
+                    refreshAnimalList(selectedHerd);
+                });
             }
         });
 
@@ -62,13 +73,16 @@ public class FarmUI extends Application {
 
         Button viewAncestorsBtn = new Button("View Ancestors");
         Button viewDescendantsBtn = new Button("View Descendants");
+        Button medicalRecordsBtn = new Button("Medical Records");
         viewAncestorsBtn.setDisable(true);
         viewDescendantsBtn.setDisable(true);
+        medicalRecordsBtn.setDisable(true);
 
         animalListView.getSelectionModel().selectedItemProperty().addListener((obs, oldAnimal, newAnimal) -> {
             boolean hasSelection = newAnimal != null;
             viewAncestorsBtn.setDisable(!hasSelection);
             viewDescendantsBtn.setDisable(!hasSelection);
+            medicalRecordsBtn.setDisable(!hasSelection);
         });
 
         viewAncestorsBtn.setOnAction(e -> {
@@ -87,15 +101,21 @@ public class FarmUI extends Application {
             }
         });
 
-        HBox buttonRow = new HBox(10, viewAncestorsBtn, viewDescendantsBtn);
+        medicalRecordsBtn.setOnAction(e -> {
+            Animal selected = animalListView.getSelectionModel().getSelectedItem();
+            if (selected != null) {
+                MedicalRecordsUI.openWindow(selected);
+            }
+        });
+
+        HBox buttonRow = new HBox(10, viewAncestorsBtn, viewDescendantsBtn, medicalRecordsBtn);
         buttonRow.setAlignment(Pos.CENTER);
         buttonRow.setPadding(new Insets(10, 0, 0, 0));
 
+        VBox herdPane = new VBox(10, new Label("Herds"), herdListView, addAnimalButton);
         VBox animalPane = new VBox(10, new Label("Animals"), animalListView, buttonRow);
 
-        HBox content = new HBox(15,
-                new VBox(10, new Label("Herds"), herdListView),
-                animalPane);
+        HBox content = new HBox(15, herdPane, animalPane);
         content.setPadding(new Insets(10));
 
         BorderPane root = new BorderPane();
@@ -105,8 +125,17 @@ public class FarmUI extends Application {
         BorderPane.setMargin(title, new Insets(0, 0, 10, 0));
 
         stage.setTitle("Farm Manager");
-        stage.setScene(new Scene(root, 700, 450));
+        stage.setScene(new Scene(root, 750, 480));
         stage.show();
+    }
+
+    @SuppressWarnings("unchecked")
+    private void refreshAnimalList(Herd newHerd) {
+        animalListView.getItems().clear();
+        if (newHerd != null) {
+            List<Animal> members = newHerd.getMembers();
+            animalListView.getItems().addAll(members);
+        }
     }
 
     // Builds a small in-memory farm with real Herd/Animal objects, including a

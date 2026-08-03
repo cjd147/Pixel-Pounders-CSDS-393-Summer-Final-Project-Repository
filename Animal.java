@@ -31,12 +31,12 @@ public abstract class Animal {
     private LocalDate birthdate;
     private List<Animal> children = new ArrayList<>();
 
-    private List<MedicalCondition> medicalConditionsList;
-    private List<MedicalProcedure> medicalProceduresList;
-    private List<Vaccination> vaccineRecord;
+    private List<MedicalCondition> medicalConditionsList = new ArrayList<>();
+    private List<MedicalProcedure> medicalProceduresList = new ArrayList<>();
+    private List<Vaccination> vaccineRecord = new ArrayList<>();
 
-    private List<Medication> medicationList;
-    private List<Dewormer> dewormerHistory;
+    private List<Medication> medicationList = new ArrayList<>();
+    private List<Dewormer> dewormerHistory = new ArrayList<>();
 
 
     private String color;
